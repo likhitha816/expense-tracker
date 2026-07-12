@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Expense Tracker</h1>
+            <p>Track your daily expenses with ease</p>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h2>Welcome to Your Expense Tracker</h2>
+                <p>This is the foundation of your expense tracking application.</p>
+                <p>Features coming soon:</p>
+                <ul>
+                    <li>✅ Add expenses</li>
+                    <li>✅ View transaction history</li>
+                    <li>✅ Visual charts and graphs</li>
+                    <li>✅ Filter by category</li>
+                </ul>
+            </section>
+
+            <section class="stats">
+                <div class="stat-card">
+                    <h3>Total Expenses</h3>
+                    <p class="stat-number">₹0.00</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Categories</h3>
+                    <p class="stat-number">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Today's Spending</h3>
+                    <p class="stat-number">₹0.00</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Expense Tracker. Built with ❤️ using Flask</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    max-width: 900px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Header styles */
+header {
+    text-align: center;
+    padding-bottom: 30px;
+    border-bottom: 3px solid #667eea;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Hero section */
+.hero {
+    background: #f8f9ff;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.hero h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    color: #555;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.hero ul {
+    list-style: none;
+    padding: 0;
+}
+
+.hero ul li {
+    padding: 10px 0;
+    color: #444;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.hero ul li:last-child {
+    border-bottom: none;
+}
+
+.hero ul li::before {
+    content: "✓ ";
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* Stats section */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding-top: 30px;
+    margin-top: 30px;
+    border-top: 2px solid #e0e0e0;
+    color: #888;
+}
+
+footer p {
+    font-size: 1rem;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .hero h2 {
+        font-size: 1.5rem;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
