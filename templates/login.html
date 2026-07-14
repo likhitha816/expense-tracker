@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 500px;">
+        <header>
+            <h1>🔐 Login</h1>
+            <p>Welcome back to Expense Tracker!</p>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="expense-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">🔓 Login</button>
+                </div>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px; color: #666;">
+                Don't have an account? <a href="{{ url_for('register') }}" style="color: #667eea;">Register here</a>
+            </p>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Expense Tracker. Built with ❤️ using Flask</p>
+        </footer>
+    </div>
+</body>
+</html>
