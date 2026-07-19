@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <h1>📊 Dashboard</h1>
+                    <p>Welcome, {{ username }}! Here's your spending overview 👋</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="{{ url_for('home') }}" class="btn-nav">🏠 Home</a>
+                    <a href="{{ url_for('add_expense') }}" class="btn-nav">➕ Add</a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">🚪 Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Stats Cards -->
+            <section class="stats">
+                <div class="stat-card">
+                    <h3>💰 Total Spending</h3>
+                    <p class="stat-number">₹{{ "%.2f"|format(total) }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📂 Categories</h3>
+                    <p class="stat-number">{{ categories_count }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📅 Today's Spend</h3>
+                    <p class="stat-number">₹{{ "%.2f"|format(today_total) }}</p>
+                </div>
+            </section>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <!-- Pie Chart: Category Breakdown -->
+                <div class="chart-card">
+                    <h3>🥧 Spending by Category</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart: Monthly Spending -->
+                <div class="chart-card">
+                    <h3>📊 Monthly Spending Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Line Chart: Daily Spending -->
+                <div class="chart-card">
+                    <h3>📈 Daily Spending (Last 7 Days)</h3>
+                    <div class="chart-container">
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Expenses -->
+                <div class="chart-card">
+                    <h3>🏆 Top 5 Expenses</h3>
+                    <div class="top-expenses-list">
+                        {% if top_expenses %}
+                            {% for expense in top_expenses %}
+                                <div class="expense-item">
+                                    <div class="expense-info">
+                                        <span class="expense-description">{{ expense.description }}</span>
+                                        <span class="expense-category">{{ expense.category }}</span>
+                                    </div>
+                                    <div class="expense-amount">₹{{ "%.2f"|format(expense.amount) }}</div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center; color: #666; padding: 20px;">No expenses recorded yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ url_for('home') }}" class="btn-add">← Back to Expense List</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Expense Tracker. Built with ❤️ using Flask & Chart.js</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data from Flask
+        const categories = {{ categories|tojson }};
+        const categoryTotals = {{ category_totals|tojson }};
+        const categoryColors = {{ category_colors|tojson }};
+        const months = {{ months|tojson }};
+        const monthlyTotals = {{ monthly_totals|tojson }};
+        const days = {{ days|tojson }};
+        const dailyTotals = {{ daily_totals|tojson }};
+
+        // 1. Pie Chart - Category Breakdown
+        const ctx1 = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    data: categoryTotals,
+                    backgroundColor: categoryColors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Bar Chart - Monthly Spending
+        const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Monthly Spending (₹)',
+                    data: monthlyTotals,
+                    backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                    borderColor: '#667eea',
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 3. Line Chart - Daily Spending
+        const ctx3 = document.getElementById('dailyChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Daily Spending (₹)',
+                    data: dailyTotals,
+                    backgroundColor: 'rgba(118, 75, 162, 0.2)',
+                    borderColor: '#764ba2',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

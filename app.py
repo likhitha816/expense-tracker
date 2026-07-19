@@ -156,5 +156,41 @@ def delete_expense(expense_id):
     flash('Expense deleted successfully!', 'success')
     return redirect(url_for('home'))
 
+# ========== DASHBOARD ROUTE ==========
+
+@app.route('/dashboard')
+def dashboard():
+    """Dashboard with charts and visualizations"""
+    if 'user_id' not in session:
+        flash('Please login to view the dashboard.', 'info')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    # Get data for charts
+    months, monthly_totals = db.get_monthly_expenses(user_id)
+    categories, category_totals, category_colors = db.get_category_breakdown(user_id)
+    days, daily_totals = db.get_daily_spending_last_7_days(user_id)
+    top_expenses = db.get_top_expenses(user_id, 5)
+    
+    # Get overall stats
+    total = db.get_total_expenses(user_id)
+    today_total = db.get_today_total(user_id)
+    categories_count = len(categories)
+    
+    return render_template('dashboard.html',
+                         months=months,
+                         monthly_totals=monthly_totals,
+                         categories=categories,
+                         category_totals=category_totals,
+                         category_colors=category_colors,
+                         days=days,
+                         daily_totals=daily_totals,
+                         top_expenses=top_expenses,
+                         total=total,
+                         today_total=today_total,
+                         categories_count=categories_count,
+                         username=session.get('username'))
+
 if __name__ == '__main__':
     app.run(debug=True)

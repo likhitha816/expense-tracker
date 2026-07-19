@@ -391,3 +391,112 @@ tr:hover {
     margin-top: 5px;
     color: #666;
 }
+
+/* Navigation Buttons */
+.btn-nav {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block;
+}
+
+.btn-nav:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Dashboard Styles */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.chart-card h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+/* Top Expenses List */
+.top-expenses-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.3s ease;
+}
+
+.expense-item:hover {
+    background: #f8f9ff;
+}
+
+.expense-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.expense-description {
+    font-weight: 600;
+    color: #333;
+}
+
+.expense-category {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.expense-amount {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Header Navigation */
+header .btn-nav, header .btn-logout {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+}

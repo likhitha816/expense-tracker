@@ -244,6 +244,120 @@ def get_today_total(user_id):
     conn.close()
     return result['total'] if result['total'] is not None else 0
 
+# ========== NEW STATS FUNCTIONS FOR CHARTS ==========
+
+def get_monthly_expenses(user_id):
+    """Get expenses grouped by month for the last 6 months"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            strftime('%Y-%m', date) as month,
+            SUM(amount) as total
+        FROM expenses
+        WHERE user_id = ?
+        GROUP BY strftime('%Y-%m', date)
+        ORDER BY month DESC
+        LIMIT 6
+    ''', (user_id,))
+    
+    results = cursor.fetchall()
+    conn.close()
+    
+    # Convert to lists for charting
+    months = [row['month'] for row in reversed(results)]
+    amounts = [row['total'] for row in reversed(results)]
+    
+    return months, amounts
+
+def get_category_breakdown(user_id):
+    """Get expenses broken down by category with colors"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            category,
+            SUM(amount) as total
+        FROM expenses
+        WHERE user_id = ?
+        GROUP BY category
+        ORDER BY total DESC
+    ''', (user_id,))
+    
+    results = cursor.fetchall()
+    conn.close()
+    
+    # Color mapping for categories
+    colors = {
+        'Food': '#FF6B6B',
+        'Transport': '#4ECDC4',
+        'Shopping': '#45B7D1',
+        'Entertainment': '#96CEB4',
+        'Bills': '#FFEAA7',
+        'Healthcare': '#DDA0DD',
+        'Education': '#98D8C8',
+        'Other': '#D3D3D3'
+    }
+    
+    categories = []
+    totals = []
+    color_list = []
+    
+    for row in results:
+        categories.append(row['category'])
+        totals.append(row['total'])
+        color_list.append(colors.get(row['category'], '#D3D3D3'))
+    
+    return categories, totals, color_list
+
+def get_daily_spending_last_7_days(user_id):
+    """Get daily spending for the last 7 days"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            date,
+            SUM(amount) as total
+        FROM expenses
+        WHERE user_id = ? 
+            AND date >= date('now', '-6 days')
+        GROUP BY date
+        ORDER BY date
+    ''', (user_id,))
+    
+    results = cursor.fetchall()
+    conn.close()
+    
+    days = [row['date'] for row in results]
+    amounts = [row['total'] for row in results]
+    
+    return days, amounts
+
+def get_top_expenses(user_id, limit=5):
+    """Get the top N expenses by amount"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            description,
+            amount,
+            category,
+            date
+        FROM expenses
+        WHERE user_id = ?
+        ORDER BY amount DESC
+        LIMIT ?
+    ''', (user_id, limit))
+    
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+
 # Initialize the database when this file is imported
 if __name__ == '__main__':
     create_tables()
