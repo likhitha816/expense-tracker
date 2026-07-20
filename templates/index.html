@@ -9,17 +9,18 @@
 <body>
     <div class="container">
         <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-        <div>
-            <h1>💰 Expense Tracker</h1>
-            <p>Welcome, {{ username }}! 👋</p>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <a href="{{ url_for('dashboard') }}" class="btn-nav">📊 Dashboard</a>
-            <a href="{{ url_for('logout') }}" class="btn-logout">🚪 Logout</a>
-        </div>
-    </div>
-</header>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <h1>💰 Expense Tracker</h1>
+                    <p>Welcome, {{ username }}! 👋</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{{ url_for('dashboard') }}" class="btn-nav">📊 Dashboard</a>
+                    <a href="{{ url_for('add_expense') }}" class="btn-nav">➕ Add</a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">🚪 Logout</a>
+                </div>
+            </div>
+        </header>
 
         <main>
             <!-- Flash Messages -->
@@ -31,10 +32,56 @@
                 {% endif %}
             {% endwith %}
 
+            <!-- Search and Filter Section -->
+            <section class="search-section">
+                <h2>🔍 Search & Filter</h2>
+                <form method="GET" action="{{ url_for('home') }}" class="search-form">
+                    <div class="search-grid">
+                        <!-- Search Bar -->
+                        <div class="form-group">
+                            <label for="search">Search:</label>
+                            <input type="text" id="search" name="search" 
+                                   placeholder="Search by description..." 
+                                   value="{{ search_term }}">
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="form-group">
+                            <label for="category">Category:</label>
+                            <select id="category" name="category">
+                                <option value="All" {% if category_filter == 'All' %}selected{% endif %}>All Categories</option>
+                                {% for cat in all_categories %}
+                                    <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>
+                                        {{ cat }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Date From -->
+                        <div class="form-group">
+                            <label for="date_from">Date From:</label>
+                            <input type="date" id="date_from" name="date_from" value="{{ date_from }}">
+                        </div>
+
+                        <!-- Date To -->
+                        <div class="form-group">
+                            <label for="date_to">Date To:</label>
+                            <input type="date" id="date_to" name="date_to" value="{{ date_to }}">
+                        </div>
+                    </div>
+
+                    <div class="search-actions">
+                        <button type="submit" class="btn-submit">🔍 Apply Filters</button>
+                        <a href="{{ url_for('home') }}" class="btn-clear">🔄 Clear Filters</a>
+                    </div>
+                </form>
+            </section>
+
             <!-- Stats Section -->
             <section class="stats">
                 <div class="stat-card">
-                    <h3>Total Expenses</h3>
+                    <h3>Filtered Total</h3>
                     <p class="stat-number">₹{{ "%.2f"|format(total) }}</p>
                 </div>
                 <div class="stat-card">
@@ -47,9 +94,25 @@
                 </div>
             </section>
 
-            <!-- Add Expense Button -->
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="{{ url_for('add_expense') }}" class="btn-add">➕ Add New Expense</a>
+            <!-- Results Count -->
+            <div class="results-info">
+                <p>Showing <strong>{{ expenses|length }}</strong> expense(s)</p>
+                {% if search_term or category_filter != 'All' or date_from or date_to %}
+                    <p class="filter-tags">
+                        {% if search_term %}
+                            <span class="filter-tag">🔍 "{{ search_term }}"</span>
+                        {% endif %}
+                        {% if category_filter != 'All' %}
+                            <span class="filter-tag">🏷️ {{ category_filter }}</span>
+                        {% endif %}
+                        {% if date_from %}
+                            <span class="filter-tag">📅 From {{ date_from }}</span>
+                        {% endif %}
+                        {% if date_to %}
+                            <span class="filter-tag">📅 To {{ date_to }}</span>
+                        {% endif %}
+                    </p>
+                {% endif %}
             </div>
 
             <!-- Expenses Table -->
@@ -86,8 +149,8 @@
                     </div>
                 {% else %}
                     <div class="empty-state">
-                        <p>📭 No expenses yet. Start tracking today!</p>
-                        <a href="{{ url_for('add_expense') }}" class="btn-add">Add Your First Expense</a>
+                        <p>📭 No expenses found matching your criteria.</p>
+                        <a href="{{ url_for('home') }}" class="btn-add">Clear Filters</a>
                     </div>
                 {% endif %}
             </section>

@@ -357,6 +357,130 @@ def get_top_expenses(user_id, limit=5):
     conn.close()
     return results
 
+# ========== SEARCH & FILTER FUNCTIONS ==========
+
+def search_expenses(user_id, search_term, category=None, date_from=None, date_to=None):
+    """
+    Search and filter expenses for a specific user.
+    
+    Args:
+        user_id: The user's ID
+        search_term: Text to search for in description
+        category: Filter by category (optional)
+        date_from: Start date in YYYY-MM-DD format (optional)
+        date_to: End date in YYYY-MM-DD format (optional)
+    
+    Returns:
+        List of matching expenses
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Start with base query
+    query = 'SELECT * FROM expenses WHERE user_id = ?'
+    params = [user_id]
+    
+    # Add search term filter
+    if search_term and search_term.strip():
+        query += ' AND description LIKE ?'
+        params.append(f'%{search_term}%')
+    
+    # Add category filter
+    if category and category != 'All':
+        query += ' AND category = ?'
+        params.append(category)
+    
+    # Add date range filters
+    if date_from:
+        query += ' AND date >= ?'
+        params.append(date_from)
+    
+    if date_to:
+        query += ' AND date <= ?'
+        params.append(date_to)
+    
+    # Order by date descending (newest first)
+    query += ' ORDER BY date DESC'
+    
+    cursor.execute(query, params)
+    expenses = cursor.fetchall()
+    
+    conn.close()
+    return expenses
+
+def get_filtered_total(user_id, search_term, category=None, date_from=None, date_to=None):
+    """Get total amount for filtered expenses"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Start with base query
+    query = 'SELECT SUM(amount) as total FROM expenses WHERE user_id = ?'
+    params = [user_id]
+    
+    # Add search term filter
+    if search_term and search_term.strip():
+        query += ' AND description LIKE ?'
+        params.append(f'%{search_term}%')
+    
+    # Add category filter
+    if category and category != 'All':
+        query += ' AND category = ?'
+        params.append(category)
+    
+    # Add date range filters
+    if date_from:
+        query += ' AND date >= ?'
+        params.append(date_from)
+    
+    if date_to:
+        query += ' AND date <= ?'
+        params.append(date_to)
+    
+    cursor.execute(query, params)
+    result = cursor.fetchone()
+    
+    conn.close()
+    return result['total'] if result['total'] is not None else 0
+
+def get_filtered_categories(user_id, search_term, category=None, date_from=None, date_to=None):
+    """Get category breakdown for filtered expenses"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Start with base query
+    query = '''
+        SELECT category, COUNT(*) as count, SUM(amount) as total
+        FROM expenses
+        WHERE user_id = ?
+    '''
+    params = [user_id]
+    
+    # Add search term filter
+    if search_term and search_term.strip():
+        query += ' AND description LIKE ?'
+        params.append(f'%{search_term}%')
+    
+    # Add category filter
+    if category and category != 'All':
+        query += ' AND category = ?'
+        params.append(category)
+    
+    # Add date range filters
+    if date_from:
+        query += ' AND date >= ?'
+        params.append(date_from)
+    
+    if date_to:
+        query += ' AND date <= ?'
+        params.append(date_to)
+    
+    query += ' GROUP BY category ORDER BY total DESC'
+    
+    cursor.execute(query, params)
+    categories = cursor.fetchall()
+    
+    conn.close()
+    return categories
 
 # Initialize the database when this file is imported
 if __name__ == '__main__':

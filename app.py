@@ -79,24 +79,40 @@ def logout():
 
 @app.route('/')
 def home():
-    """Home page - shows user's expenses"""
+    """Home page - shows filtered expenses based on search/filters"""
     # Check if user is logged in
     if 'user_id' not in session:
         flash('Please login to view your expenses.', 'info')
         return redirect(url_for('login'))
     
     user_id = session['user_id']
-    expenses = db.get_expenses_by_user(user_id)
-    total = db.get_total_expenses(user_id)
-    categories = db.get_expenses_by_category(user_id)
+    
+    # Get search and filter parameters from URL
+    search_term = request.args.get('search', '')
+    category_filter = request.args.get('category', 'All')
+    date_from = request.args.get('date_from', '')
+    date_to = request.args.get('date_to', '')
+    
+    # Get expenses with filters
+    expenses = db.search_expenses(user_id, search_term, category_filter, date_from, date_to)
+    total = db.get_filtered_total(user_id, search_term, category_filter, date_from, date_to)
+    categories = db.get_filtered_categories(user_id, search_term, category_filter, date_from, date_to)
     today_total = db.get_today_total(user_id)
+    
+    # Get all categories for dropdown
+    all_categories = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Healthcare', 'Education', 'Other']
     
     return render_template('index.html', 
                          expenses=expenses, 
                          total=total,
                          categories=categories,
                          today_total=today_total,
-                         username=session.get('username'))
+                         username=session.get('username'),
+                         search_term=search_term,
+                         category_filter=category_filter,
+                         all_categories=all_categories,
+                         date_from=date_from,
+                         date_to=date_to)
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_expense():

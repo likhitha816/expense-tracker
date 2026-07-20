@@ -500,3 +500,121 @@ header .btn-nav, header .btn-logout {
     font-size: 0.9rem;
     padding: 8px 16px;
 }
+
+/* Search and Filter Section */
+.search-section {
+    background: #f8f9ff;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.search-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+.search-grid .form-group {
+    margin-bottom: 0;
+}
+
+.search-grid .form-group label {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.search-grid .form-group input,
+.search-grid .form-group select {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+}
+
+.search-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.search-actions .btn-submit {
+    flex: 0 1 auto;
+    padding: 10px 30px;
+}
+
+.search-actions .btn-clear {
+    flex: 0 1 auto;
+    background: #f0f0f0;
+    color: #666;
+    padding: 10px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    transition: background 0.3s ease;
+    border: none;
+    display: inline-block;
+}
+
+.search-actions .btn-clear:hover {
+    background: #e0e0e0;
+}
+
+/* Results Info */
+.results-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 15px 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.results-info p {
+    color: #666;
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+.filter-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-tag {
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+/* Responsive Search */
+@media (max-width: 768px) {
+    .search-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-actions {
+        flex-direction: column;
+    }
+    
+    .search-actions .btn-submit,
+    .search-actions .btn-clear {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .results-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
