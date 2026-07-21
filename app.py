@@ -2,6 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from datetime import datetime
 import database as db
 import auth
+import csv
+import io
+from flask import make_response, send_file
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-this-in-production'  # Change this!
@@ -208,5 +212,94 @@ def dashboard():
                          categories_count=categories_count,
                          username=session.get('username'))
 
+# ========== EXPORT ROUTES ==========
+
+@app.route('/export/csv')
+def export_csv():
+    """Export expenses to CSV file"""
+    if 'user_id' not in session:
+        flash('Please login to export data.', 'info')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    # Get filters from URL
+    date_from = request.args.get('date_from', '')
+    date_to = request.args.get('date_to', '')
+    
+    # Get expenses
+    expenses = db.get_expenses_by_date_range(user_id, date_from, date_to)
+    
+    # Create CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    writer.writerow(['Date', 'Description', 'Category', 'Amount (₹)'])
+    
+    # Write data
+    for expense in expenses:
+        writer.writerow([
+            expense['date'],
+            expense['description'],
+            expense['category'],
+            f"{expense['amount']:.2f}"
+        ])
+    
+    # Create response
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=expenses_export.csv'
+    response.headers['Content-Type'] = 'text/csv'
+    
+    flash('Expenses exported successfully!', 'success')
+    return response
+
+@app.route('/report')
+def report():
+    """Generate summary report"""
+    if 'user_id' not in session:
+        flash('Please login to view reports.', 'info')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    category_summary = db.get_category_summary(user_id)
+    monthly_summary = db.get_monthly_summary(user_id)
+    stats = db.get_expense_stats(user_id)
+    current_year = datetime.now().year
+    total_expenses = db.get_total_expenses(user_id)
+    
+    return render_template('report.html',
+                         category_summary=category_summary,
+                         monthly_summary=monthly_summary,
+                         stats=stats,
+                         total_expenses=total_expenses,
+                         current_year=current_year,
+                         username=session.get('username'),
+                         now=datetime.now())  # Keep this
+@app.route('/report/print')
+def print_report():
+    """Print-friendly version of report"""
+    if 'user_id' not in session:
+        flash('Please login to view reports.', 'info')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    category_summary = db.get_category_summary(user_id)
+    monthly_summary = db.get_monthly_summary(user_id)
+    stats = db.get_expense_stats(user_id)
+    total_expenses = db.get_total_expenses(user_id)
+    
+    return render_template('report.html',
+                         category_summary=category_summary,
+                         monthly_summary=monthly_summary,
+                         stats=stats,
+                         total_expenses=total_expenses,
+                         current_year=datetime.now().year,
+                         username=session.get('username'),
+                         print_mode=True,
+                         now=datetime.now())  # Keep this
 if __name__ == '__main__':
     app.run(debug=True)

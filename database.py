@@ -482,6 +482,145 @@ def get_filtered_categories(user_id, search_term, category=None, date_from=None,
     conn.close()
     return categories
 
+# ========== EXPORT FUNCTIONS ==========
+
+def get_expenses_by_date_range(user_id, date_from=None, date_to=None):
+    """Get expenses within a date range for a user"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    query = 'SELECT * FROM expenses WHERE user_id = ?'
+    params = [user_id]
+    
+    if date_from:
+        query += ' AND date >= ?'
+        params.append(date_from)
+    
+    if date_to:
+        query += ' AND date <= ?'
+        params.append(date_to)
+    
+    query += ' ORDER BY date DESC'
+    
+    cursor.execute(query, params)
+    expenses = cursor.fetchall()
+    conn.close()
+    return expenses
+
+def get_category_summary(user_id):
+    """Get summary of spending by category"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            category,
+            COUNT(*) as count,
+            SUM(amount) as total,
+            ROUND(AVG(amount), 2) as average
+        FROM expenses
+        WHERE user_id = ?
+        GROUP BY category
+        ORDER BY total DESC
+    ''', (user_id,))
+    
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+def get_monthly_summary(user_id, year=None):
+    """Get monthly summary for a specific year"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    if not year:
+        year = datetime.now().year
+    
+    cursor.execute('''
+        SELECT 
+            strftime('%m', date) as month,
+            COUNT(*) as count,
+            SUM(amount) as total,
+            ROUND(AVG(amount), 2) as average
+        FROM expenses
+        WHERE user_id = ? AND strftime('%Y', date) = ?
+        GROUP BY strftime('%m', date)
+        ORDER BY month
+    ''', (user_id, str(year)))
+    
+    results = cursor.fetchall()
+    conn.close()
+    
+    # Month names mapping
+    month_names = {
+        '01': 'January', '02': 'February', '03': 'March',
+        '04': 'April', '05': 'May', '06': 'June',
+        '07': 'July', '08': 'August', '09': 'September',
+        '10': 'October', '11': 'November', '12': 'December'
+    }
+    
+    # Format results
+    formatted_results = []
+    for row in results:
+        formatted_results.append({
+            'month_num': row['month'],
+            'month_name': month_names.get(row['month'], row['month']),
+            'count': row['count'],
+            'total': row['total'],
+            'average': row['average']
+        })
+    
+    return formatted_results
+
+def get_total_expenses_by_date_range(user_id, date_from=None, date_to=None):
+    """Get total expenses within a date range"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    query = 'SELECT SUM(amount) as total FROM expenses WHERE user_id = ?'
+    params = [user_id]
+    
+    if date_from:
+        query += ' AND date >= ?'
+        params.append(date_from)
+    
+    if date_to:
+        query += ' AND date <= ?'
+        params.append(date_to)
+    
+    cursor.execute(query, params)
+    result = cursor.fetchone()
+    conn.close()
+    
+    return result['total'] if result['total'] is not None else 0
+
+def get_expense_stats(user_id):
+    """Get overall statistics for a user"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            COUNT(*) as total_count,
+            SUM(amount) as total_amount,
+            ROUND(AVG(amount), 2) as average_amount,
+            MIN(amount) as min_amount,
+            MAX(amount) as max_amount
+        FROM expenses
+        WHERE user_id = ?
+    ''', (user_id,))
+    
+    result = cursor.fetchone()
+    conn.close()
+    
+    return {
+        'total_count': result['total_count'] if result['total_count'] else 0,
+        'total_amount': result['total_amount'] if result['total_amount'] else 0,
+        'average_amount': result['average_amount'] if result['average_amount'] else 0,
+        'min_amount': result['min_amount'] if result['min_amount'] else 0,
+        'max_amount': result['max_amount'] if result['max_amount'] else 0
+    }
+
 # Initialize the database when this file is imported
 if __name__ == '__main__':
     create_tables()

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Report - Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .container {
+                box-shadow: none !important;
+                padding: 20px !important;
+            }
+            .stat-card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <h1>📊 Expense Report</h1>
+                    <p>Generated for: {{ username }} | {{ current_year }}</p>
+                </div>
+                <div class="no-print" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{{ url_for('home') }}" class="btn-nav">🏠 Home</a>
+                    <a href="{{ url_for('dashboard') }}" class="btn-nav">📊 Dashboard</a>
+                    <a href="{{ url_for('export_csv') }}" class="btn-nav">📥 Export CSV</a>
+                    <button onclick="window.print()" class="btn-submit">🖨️ Print</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Summary Stats -->
+            <section class="stats">
+                <div class="stat-card">
+                    <h3>💰 Total Expenses</h3>
+                    <p class="stat-number">₹{{ "%.2f"|format(stats.total_amount) }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📋 Total Transactions</h3>
+                    <p class="stat-number">{{ stats.total_count }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Average Transaction</h3>
+                    <p class="stat-number">₹{{ "%.2f"|format(stats.average_amount) }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 Range</h3>
+                    <p class="stat-number">₹{{ "%.2f"|format(stats.min_amount) }} - ₹{{ "%.2f"|format(stats.max_amount) }}</p>
+                </div>
+            </section>
+
+            <!-- Category Summary -->
+            <section class="report-section">
+                <h2>📂 Spending by Category</h2>
+                {% if category_summary %}
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Number of Expenses</th>
+                                    <th>Total Amount</th>
+                                    <th>Average Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in category_summary %}
+                                <tr>
+                                    <td><span class="badge">{{ cat.category }}</span></td>
+                                    <td>{{ cat.count }}</td>
+                                    <td class="amount">₹{{ "%.2f"|format(cat.total) }}</td>
+                                    <td>₹{{ "%.2f"|format(cat.average) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong>{{ category_summary|sum(attribute='count') }}</strong></td>
+                                    <td><strong>₹{{ "%.2f"|format(total_expenses) }}</strong></td>
+                                    <td><strong>₹{{ "%.2f"|format(total_expenses / category_summary|sum(attribute='count') if category_summary|sum(attribute='count') > 0 else 0) }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No expenses recorded yet.</p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- Monthly Summary -->
+            <section class="report-section">
+                <h2>📅 Monthly Breakdown</h2>
+                {% if monthly_summary %}
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Number of Expenses</th>
+                                    <th>Total Amount</th>
+                                    <th>Average Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for month in monthly_summary %}
+                                <tr>
+                                    <td>{{ month.month_name }}</td>
+                                    <td>{{ month.count }}</td>
+                                    <td class="amount">₹{{ "%.2f"|format(month.total) }}</td>
+                                    <td>₹{{ "%.2f"|format(month.average) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong>{{ monthly_summary|sum(attribute='count') }}</strong></td>
+                                    <td><strong>₹{{ "%.2f"|format(total_expenses) }}</strong></td>
+                                    <td><strong>₹{{ "%.2f"|format(total_expenses / monthly_summary|sum(attribute='count') if monthly_summary|sum(attribute='count') > 0 else 0) }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No expenses recorded this year.</p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- Quick Statistics -->
+            <section class="report-section">
+                <h2>📊 Quick Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Total Expenses</span>
+                        <span class="stat-value">₹{{ "%.2f"|format(stats.total_amount) }}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Total Transactions</span>
+                        <span class="stat-value">{{ stats.total_count }}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Average Transaction</span>
+                        <span class="stat-value">₹{{ "%.2f"|format(stats.average_amount) }}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Highest Expense</span>
+                        <span class="stat-value">₹{{ "%.2f"|format(stats.max_amount) }}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Lowest Expense</span>
+                        <span class="stat-value">₹{{ "%.2f"|format(stats.min_amount) }}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Number of Categories</span>
+                        <span class="stat-value">{{ category_summary|length }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer Note -->
+            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e0e0e0; color: #888; font-size: 0.9rem;">
+                <p id="report-timestamp">Report generated on loading...</p>
+                <p>Expense Tracker © {{ current_year }}</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Add timestamp to report using JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            const timestamp = now.toLocaleDateString('en-US', options);
+            const footer = document.getElementById('report-timestamp');
+            if (footer) {
+                footer.textContent = `Report generated on ${timestamp}`;
+            }
+        });
+    </script>
+</body>
+</html>

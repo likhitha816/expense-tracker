@@ -16,6 +16,7 @@
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="{{ url_for('dashboard') }}" class="btn-nav">📊 Dashboard</a>
+                    <a href="{{ url_for('report') }}" class="btn-nav">📄 Report</a>
                     <a href="{{ url_for('add_expense') }}" class="btn-nav">➕ Add</a>
                     <a href="{{ url_for('logout') }}" class="btn-logout">🚪 Logout</a>
                 </div>
@@ -113,6 +114,15 @@
                         {% endif %}
                     </p>
                 {% endif %}
+            </div>
+
+            <!-- Add Expense and Export Buttons -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0; flex-wrap: wrap; gap: 15px;">
+                <a href="{{ url_for('add_expense') }}" class="btn-add">➕ Add New Expense</a>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{{ url_for('export_csv') }}" class="btn-export">📥 Export All</a>
+                    <a href="{{ url_for('export_csv') }}?{{ request.query_string.decode() }}" class="btn-export-filtered">📥 Export Filtered</a>
+                </div>
             </div>
 
             <!-- Expenses Table -->
