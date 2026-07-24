@@ -709,3 +709,73 @@ tfoot td {
     padding: 15px;
     border-top: 2px solid #667eea;
 }
+
+/* Error Pages */
+.error-page {
+    padding: 40px 20px;
+}
+
+.error-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 900;
+    color: #667eea;
+    margin: 0;
+}
+
+.error-title {
+    font-size: 2rem;
+    color: #333;
+    margin: 10px 0 20px;
+}
+
+.error-message {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Form validation styles */
+.form-group input:invalid,
+.form-group select:invalid {
+    border-color: #ff6b6b;
+}
+
+.form-group input:valid,
+.form-group select:valid {
+    border-color: #6bcb77;
+}
+
+.form-group input:focus:invalid,
+.form-group select:focus:invalid {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+/* Password strength indicator */
+#password-strength {
+    margin-top: 5px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* Input validation feedback */
+.form-group .validation-feedback {
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: none;
+}
+
+.form-group input:invalid ~ .validation-feedback {
+    display: block;
+    color: #ff6b6b;
+}
+
+.form-group input:valid ~ .validation-feedback {
+    display: none;
+}

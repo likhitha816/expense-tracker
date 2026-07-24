@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error - Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 600px; text-align: center;">
+        <header>
+            <h1>💰 Expense Tracker</h1>
+        </header>
+
+        <main>
+            <div class="error-page">
+                <div class="error-icon">⚠️</div>
+                <h1 class="error-code">500</h1>
+                <h2 class="error-title">Internal Server Error</h2>
+                <p class="error-message">
+                    Something went wrong on our end. We're working to fix it.
+                </p>
+                <p class="error-message" style="font-size: 0.9rem; color: #888;">
+                    Please try again later.
+                </p>
+                <div style="margin-top: 30px;">
+                    <a href="{{ url_for('home') }}" class="btn-add">🏠 Go to Homepage</a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Expense Tracker. Built with ❤️ using Flask</p>
+        </footer>
+    </div>
+</body>
+</html>

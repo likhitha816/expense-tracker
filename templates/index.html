@@ -33,6 +33,12 @@
                 {% endif %}
             {% endwith %}
 
+	    <!-- Add this after the flash messages -->
+{% if request.args.get('error') %}
+    <div class="alert alert-error">{{ request.args.get('error') }}</div>
+{% endif %}
+		
+
             <!-- Search and Filter Section -->
             <section class="search-section">
                 <h2>🔍 Search & Filter</h2>
@@ -128,6 +134,7 @@
             <!-- Expenses Table -->
             <section class="expenses-section">
                 <h2>📋 Transaction History</h2>
+
                 
                 {% if expenses %}
                     <div class="table-responsive">

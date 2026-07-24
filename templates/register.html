@@ -25,7 +25,45 @@
             <form method="POST" class="expense-form">
                 <div class="form-group">
                     <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required placeholder="Choose a username">
+                    <!-- Update the username input -->
+<input type="text" id="username" name="username" required 
+       minlength="3" maxlength="20" pattern="[A-Za-z0-9]+"
+       placeholder="Choose a username (letters & numbers only)"
+       title="Username must be 3-20 characters, letters and numbers only">
+
+<!-- Update the password input -->
+<input type="password" id="password" name="password" required 
+       minlength="8"
+       placeholder="Min 8 chars, with uppercase & number"
+       title="Password must be at least 8 characters with uppercase and number">
+
+<!-- Add password strength indicator (optional) -->
+<div id="password-strength" style="margin-top: 5px; font-size: 0.85rem;"></div>
+
+<script>
+    // Simple password strength indicator
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strength = document.getElementById('password-strength');
+        
+        if (password.length === 0) {
+            strength.textContent = '';
+            return;
+        }
+        
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        
+        const messages = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+        const colors = ['#ff6b6b', '#ffa94d', '#ffd93d', '#6bcb77', '#4d96ff'];
+        
+        strength.textContent = 'Strength: ' + messages[score];
+        strength.style.color = colors[score];
+    });
+</script>
                 </div>
 
                 <div class="form-group">
