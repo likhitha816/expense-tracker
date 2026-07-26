@@ -3,7 +3,8 @@ from datetime import datetime
 import auth
 
 # Database file name
-DB_NAME = 'expenses.db'
+import os
+DB_NAME = os.environ.get('DATABASE_URL', 'expenses.db').replace('sqlite:///', '')
 
 def get_connection():
     """Create and return a database connection"""
