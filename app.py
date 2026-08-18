@@ -32,14 +32,26 @@ def method_not_allowed(error):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """User registration with validation"""
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '')
-        confirm_password = request.form.get('confirm_password', '')
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
         
-        # Validate username
+        # DEBUG: Print what we received
+        print(f"DEBUG - Password: '{password}'")
+        print(f"DEBUG - Confirm: '{confirm_password}'")
+        print(f"DEBUG - Length Password: {len(password)}")
+        print(f"DEBUG - Length Confirm: {len(confirm_password)}")
+        print(f"DEBUG - Match: {password == confirm_password}")
+        
+        # Validate passwords match
+        if password != confirm_password:
+            flash('Passwords do not match!', 'error')
+            return render_template('register.html')        # Validate passwords match
+        if password != confirm_password:
+            flash('Passwords do not match!', 'error')
+            return render_template('register.html')        # Validate username
         if not username:
             flash('Username is required!', 'error')
             return render_template('register.html')
